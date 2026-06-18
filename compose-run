@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker compose run --rm app composer install
+docker compose run --rm app cp .env.example .env || true
+docker compose run --rm app php artisan key:generate
+docker compose run --rm app php artisan migrate

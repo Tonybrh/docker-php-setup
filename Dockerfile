@@ -18,20 +18,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configurar diretório de trabalho
 WORKDIR /var/www
 
-# Copiar arquivos da aplicação
-COPY . /var/www
-
-# Garantir diretórios exigidos pelo Laravel antes do composer scripts
+# O codigo da aplicacao sera montado por volume em tempo de execucao.
+# Mantemos apenas um bootstrap minimo para projetos Laravel.
 RUN mkdir -p /var/www/bootstrap/cache /var/www/storage \
-    && chown -R www-data:www-data /var/www
-
-# Instalar dependências do Laravel
-RUN composer install --optimize-autoloader --no-dev
-
-# Configurar permissões
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 
 RUN echo "precedence ::ffff:0:0/96  100" >> /etc/gai.conf
@@ -40,4 +31,3 @@ RUN echo "precedence ::ffff:0:0/96  100" >> /etc/gai.conf
 EXPOSE 9000
 
 CMD ["php-fpm"]
-
